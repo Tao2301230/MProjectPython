@@ -1,6 +1,5 @@
 # Refer from https://stackoverflow.com/questions/26213549/switching-between-frames-in-tkinter-menu
 from Tkinter import *
-from Tkinter import ttk
 import Tkinter as tk
 
 class BaseFrame(tk.Frame):
@@ -22,9 +21,9 @@ class BaseFrame(tk.Frame):
                                   command=lambda: self.controller.show_frame(HibenchPSFrame))
         self.menu_bar.add_command(label = 'Set Opentuner',
                                   command=lambda: self.controller.show_frame(OpentunerPSFrame))
-        self.menu_bar.add_command(label='Set HiBench',
+        self.menu_bar.add_command(label='Parameter Space Summary',
                                   command=lambda: self.controller.show_frame(PSSummaryFrame))
-        self.menu_bar.add_command(label='Set HiBench',
+        self.menu_bar.add_command(label='Runtime Monitor',
                                   command=lambda: self.controller.show_frame(RuntimeFrame))
 
     def __aboutHandler(self):
@@ -44,9 +43,9 @@ class SparkPSFrame(BaseFrame):
                                   command=lambda: self.controller.show_frame(HibenchPSFrame))
         self.menu_bar.add_command(label='Set Opentuner',
                                   command=lambda: self.controller.show_frame(OpentunerPSFrame))
-        self.menu_bar.add_command(label='Set HiBench',
+        self.menu_bar.add_command(label='Parameter Space Summary',
                                   command=lambda: self.controller.show_frame(PSSummaryFrame))
-        self.menu_bar.add_command(label='Set HiBench',
+        self.menu_bar.add_command(label='Runtime Monitor',
                                   command=lambda: self.controller.show_frame(RuntimeFrame))
 
 
@@ -69,11 +68,39 @@ class HibenchPSFrame(BaseFrame):
         self.menu_bar.add_command(label='Set HiBench',
                                   command=lambda: self.controller.show_frame(RuntimeFrame))
 
-        self.workload_label = tk.Label(self, 'Select WorkLoad: ')
-        self.workload_label.grid(padx=5, pady=5, sticky=tk.W + tk.E)
+        self.page_label = tk.Label(self, text='Hibench Parameter Space')
+        self.page_label.grid(row = 0, padx = 5, pady = 5, sticky = tk.W + tk.E)
+
+        self.workload_label = tk.Label(self, text = 'Select WorkLoad: ')
+        self.workload_label.grid(row = 1, padx = 5, pady = 5, sticky = tk.W + tk.E)
+
+        '''
+        hibench.wordcount.tiny.datasize                 32000
+        hibench.wordcount.small.datasize                320000000
+        hibench.wordcount.large.datasize                3200000000
+        hibench.wordcount.huge.datasize                 32000000000
+        hibench.wordcount.gigantic.datasize             320000000000
+        hibench.wordcount.bigdata.datasize              1600000000000
+        '''
 
         workload = StringVar()
-        self.workload_combobox =
+        col = 2
+        for r in ('tiny', 'small', 'large', 'huge', 'gigantic', 'bigdata'):
+            Radiobutton(self, variable = workload, text = r, value = r).grid(row = 1, column = col)
+            col += 2
+
+        self.task_label = tk.Label(self, text='Select Task: ')
+        self.task_label.grid(row = 2, column = 0, padx = 5, pady = 5, sticky = tk.W + tk.E)
+
+        hibench_task = StringVar()
+        col = 2
+        for r in ('WordCount', 'Sort', 'TeraSort', 'linear', 'SVD', 'KMeans', 'PageRank'):
+            Radiobutton(self, variable = hibench_task, text = r, value = r).grid(row = 2, column = col)
+            col += 2
+
+        self.submit_button = tk.Button(self, text = 'Add')
+        self.submit_button.grid(row = 5, column = 5)
+        print workload
 
 
 class OpentunerPSFrame(BaseFrame):
@@ -89,9 +116,9 @@ class OpentunerPSFrame(BaseFrame):
                                   command=lambda: self.controller.show_frame(HibenchPSFrame))
         self.menu_bar.add_command(label = 'Set Opentuner',
                                   command=lambda: self.controller.show_frame(OpentunerPSFrame))
-        self.menu_bar.add_command(label='Set HiBench',
+        self.menu_bar.add_command(label='Parameter Space Summary',
                                   command=lambda: self.controller.show_frame(PSSummaryFrame))
-        self.menu_bar.add_command(label='Set HiBench',
+        self.menu_bar.add_command(label='Runtime Monitor',
                                   command=lambda: self.controller.show_frame(RuntimeFrame))
 
 
@@ -108,9 +135,9 @@ class PSSummaryFrame(BaseFrame):
                                   command=lambda: self.controller.show_frame(HibenchPSFrame))
         self.menu_bar.add_command(label='Set Opentuner',
                                   command=lambda: self.controller.show_frame(OpentunerPSFrame))
-        self.menu_bar.add_command(label='Set HiBench',
+        self.menu_bar.add_command(label='Parameter Space Summary',
                                   command=lambda: self.controller.show_frame(PSSummaryFrame))
-        self.menu_bar.add_command(label='Set HiBench',
+        self.menu_bar.add_command(label='Runtime Monitor',
                                   command=lambda: self.controller.show_frame(RuntimeFrame))
         self.new_button = tk.Button(self)
         self.new_button.grid(padx=5, pady=5, sticky=tk.W + tk.E)
@@ -129,9 +156,9 @@ class RuntimeFrame(BaseFrame):
                                   command=lambda: self.controller.show_frame(HibenchPSFrame))
         self.menu_bar.add_command(label = 'Set Opentuner',
                                   command=lambda: self.controller.show_frame(OpentunerPSFrame))
-        self.menu_bar.add_command(label='Set HiBench',
+        self.menu_bar.add_command(label='Parameter Space Summary',
                                   command=lambda: self.controller.show_frame(PSSummaryFrame))
-        self.menu_bar.add_command(label='Set HiBench',
+        self.menu_bar.add_command(label='Runtime Monitor',
                                   command=lambda: self.controller.show_frame(RuntimeFrame))
 
         self.new_text = tk.Entry(self)
