@@ -3,6 +3,13 @@ from Tkinter import *
 import Tkinter as tk
 import ttk
 
+# Global Variable
+
+spark_parameter={}
+hibench_parameter={}
+opentuner_parameter={}
+
+
 class BaseFrame(tk.Frame):
 
     def __init__(self, master, controller):
@@ -31,10 +38,16 @@ class BaseFrame(tk.Frame):
         print "help handler"
 
 '''
-haven't implement 
+completed: 
     Checkbox: bind with Save Button
+
+haven't implement          
     Add to Template, Add to New File bind with 2 Entries and 1 ComboBox
     Table to show final parameter
+    
+more:
+    validation:
+        title, type bind with range
 '''
 class SparkPSFrame(BaseFrame):
 
@@ -70,11 +83,11 @@ class SparkPSFrame(BaseFrame):
         align-labels        EnumParameter       on | off | default
         
         '''
-
+        # it can be read from a json file
         spark_PS = {'opt_level':['IntegerParameter', '0-3'],
-                    'align-functions':['EnumParameter', 'on | off | default'],
-                    'align-jumps':['EnumParameter', 'on | off | default'],
-                    'align-labels':['EnumParameter', 'on | off | default']}
+                    'align-functions':['EnumParameter', 'on|off|default'],
+                    'align-jumps':['EnumParameter', 'on|off|default'],
+                    'align-labels':['EnumParameter', 'on|off|default']}
 
         col = 0
         for i in ['Parameter title', 'Parameter type', 'Parameter range', 'Option']:
@@ -82,17 +95,22 @@ class SparkPSFrame(BaseFrame):
             col += 1
         crow = 3
         col = 0
-        var = StringVar()
 
+
+        self.spark_ps=[] # Store the final result
+        self.cb_vars=[]
         for k,v in spark_PS.items():
+            var = IntVar()
             Label(self, text=k).grid(row=crow, column=col)
             Label(self, text=v[0]).grid(row=crow, column=col+1)
             Label(self, text=v[1]).grid(row=crow, column=col+2)
-            Checkbutton(self, variable=var).grid(row=crow, column=col+3)
+            cb=Checkbutton(self, variable=var)
+            cb.grid(row=crow, column=col+3)
+            self.cb_vars.append(var)
+            self.spark_ps.append(k + ' ' + v[0] + ' ' + v[1])
             crow += 1
 
-
-        self.ps_DFT_save = tk.Button(self, text='Save ')
+        self.ps_DFT_save = Button(self, text='Save', command=self.save_template)
         self.ps_DFT_save.grid(row=9, column=2, padx=5, pady=5,sticky=tk.W + tk.E)
 
 
@@ -132,6 +150,15 @@ class SparkPSFrame(BaseFrame):
 
         self.ps_SFS_add = tk.Button(self, text='Add to New File')
         self.ps_SFS_add.grid(row=16, column=2, padx=5, pady=5,sticky=tk.W + tk.E)
+
+    def save_template(self):
+        result = [i.get() for i in self.cb_vars]
+        final_spark_ps = [self.spark_ps[i] for i in range(len(result)) if result[i]==1]
+
+        for item in final_spark_ps:
+            s=item.split()
+            spark_parameter[s[0]] = [s[1],s[2]]
+        print spark_parameter
 
 
 
