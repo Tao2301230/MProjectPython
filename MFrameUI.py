@@ -1,13 +1,17 @@
 # Refer from https://stackoverflow.com/questions/26213549/switching-between-frames-in-tkinter-menu
+
+import adddeps
 from Tkinter import *
 import Tkinter as tk
 import ttk
+from spark_tuner import GccFlagsTuner
+import opentuner
 
 # Global Variable
 
 spark_parameter={}
 hibench_parameter=[]
-opentuner_parameter={}
+opentuner_parameter=[]
 task_id=0
 
 
@@ -28,8 +32,7 @@ class BaseFrame(tk.Frame):
                                   command=lambda: self.controller.show_frame(SparkPSFrame))
         self.menu_bar.add_command(label = 'Set HiBench',
                                   command=lambda: self.controller.show_frame(HibenchPSFrame))
-        self.menu_bar.add_command(label = 'Set Opentuner',
-                                  command=lambda: self.controller.show_frame(OpentunerPSFrame))
+
         self.menu_bar.add_command(label='Parameter Space Summary',
                                   command=lambda: self.controller.show_frame(PSSummaryFrame))
         self.menu_bar.add_command(label='Runtime Monitor',
@@ -57,17 +60,6 @@ class SparkPSFrame(BaseFrame):
         top = self.winfo_toplevel()
         self.menu_bar = tk.Menu()
         top['menu'] = self.menu_bar
-
-        self.menu_bar.add_command(label='Set Spark',
-                                  command=lambda: self.controller.show_frame(SparkPSFrame))
-        self.menu_bar.add_command(label='Set HiBench',
-                                  command=lambda: self.controller.show_frame(HibenchPSFrame))
-        self.menu_bar.add_command(label='Set Opentuner',
-                                  command=lambda: self.controller.show_frame(OpentunerPSFrame))
-        self.menu_bar.add_command(label='Parameter Space Summary',
-                                  command=lambda: self.controller.show_frame(PSSummaryFrame))
-        self.menu_bar.add_command(label='Runtime Monitor',
-                                  command=lambda: self.controller.show_frame(RuntimeFrame))
 
         self.page_label = tk.Label(self, text='Spark Parameter Space')
         self.page_label.grid(row = 0, padx = 5, pady = 5, sticky = tk.W + tk.E)
@@ -214,7 +206,7 @@ class SparkPSFrame(BaseFrame):
 
 
 '''
-haven't implement
+Complete
     Add Button: bind with 2 RadioButtons
     Table to show final parameter
 '''
@@ -224,17 +216,6 @@ class HibenchPSFrame(BaseFrame):
         top = self.winfo_toplevel()
         self.menu_bar = tk.Menu()
         top['menu'] = self.menu_bar
-
-        self.menu_bar.add_command(label='Set Spark',
-                                  command=lambda: self.controller.show_frame(SparkPSFrame))
-        self.menu_bar.add_command(label='Set HiBench',
-                                  command=lambda: self.controller.show_frame(HibenchPSFrame))
-        self.menu_bar.add_command(label='Set Opentuner',
-                                  command=lambda: self.controller.show_frame(OpentunerPSFrame))
-        self.menu_bar.add_command(label='Set HiBench',
-                                  command=lambda: self.controller.show_frame(PSSummaryFrame))
-        self.menu_bar.add_command(label='Set HiBench',
-                                  command=lambda: self.controller.show_frame(RuntimeFrame))
 
         self.page_label = tk.Label(self, text='Hibench Parameter Space')
         self.page_label.grid(row = 0, padx = 5, pady = 5, sticky = tk.W + tk.E)
@@ -268,51 +249,12 @@ class HibenchPSFrame(BaseFrame):
             Radiobutton(self, variable = self.hibench_task, text = r, value = r).grid(row = 2, column = col)
             col += 2
 
-        self.submit_button = tk.Button(self, text = 'Add', command = self.add_task)
-        self.submit_button.grid(row = 5, column = 5)
+        # Set Opentuner
 
-        Label(self, text='Task Summary: ').grid()
-
-
-    def add_task(self):
-        value = []
-        value.append(self.workload.get())
-        value.append(self.hibench_task.get())
-        global task_id, hibench_parameter
-        hibench_parameter.append(value)
-
-        Label(self, text='Task' + str(task_id) + ': ' + hibench_parameter[task_id][1]
-                         + ', Workload: '+ hibench_parameter[task_id][0])\
-            .grid(column=2, columnspan=6)
-        print "finish add task"
-        task_id += 1
-
-
-'''
-haven't implement 
-    Save Button: bind with 2 ComboBox and 1 Entry
-
-'''
-class OpentunerPSFrame(BaseFrame):
-
-    def create_widgets(self):
-        top = self.winfo_toplevel()
-        self.menu_bar = tk.Menu()
-        top['menu'] = self.menu_bar
-
-        self.menu_bar.add_command(label='Set Spark',
-                                  command=lambda: self.controller.show_frame(SparkPSFrame))
-        self.menu_bar.add_command(label='Set HiBench',
-                                  command=lambda: self.controller.show_frame(HibenchPSFrame))
-        self.menu_bar.add_command(label='Set Opentuner',
-                                  command=lambda: self.controller.show_frame(OpentunerPSFrame))
-        self.menu_bar.add_command(label='Parameter Space Summary',
-                                  command=lambda: self.controller.show_frame(PSSummaryFrame))
-        self.menu_bar.add_command(label='Runtime Monitor',
-                                  command=lambda: self.controller.show_frame(RuntimeFrame))
+        Label(self, text='OpenTuner Parameter Space').grid(row=4)
 
         self.ot_st_label = Label(self, text='Search Technique: ')
-        self.ot_st_label.grid(row=0, column=0, padx=5, pady=5, sticky=tk.W + tk.E)
+        self.ot_st_label.grid(row=5, column=0, padx=5, pady=5, sticky=tk.W + tk.E)
 
         self.st = StringVar()
         self.search_technique = ttk.Combobox(self, textvariable=self.st)
@@ -320,17 +262,17 @@ class OpentunerPSFrame(BaseFrame):
         self.search_technique['state'] = 'readonly'
         self.search_technique.current(0)
         # self.bind('')
-        self.search_technique.grid(row=0, column=1, padx=5, pady=5, sticky=tk.W + tk.E)
+        self.search_technique.grid(row=5, column=2, columnspan=4, padx=5, pady=5, sticky=tk.W + tk.E)
 
         self.ot_limit_label = Label(self, text='Limit: ')
-        self.ot_limit_label.grid(row=1, column=0, padx=5, pady=5, sticky=tk.W + tk.E)
+        self.ot_limit_label.grid(row=6, column=0, padx=5, pady=5, sticky=tk.W + tk.E)
 
         self.ot_limit = tk.Entry(self, text='limit')
-        self.ot_limit.grid(row=1, column=1, padx=5, pady=5, sticky=tk.W + tk.E)
+        self.ot_limit.grid(row=6, column=2, columnspan=4, padx=5, pady=5, sticky=tk.W + tk.E)
 
         # Tune Condition
         self.ot_tc_label = Label(self, text='Tune Condition: ')
-        self.ot_tc_label.grid(row=2, column=0, padx=5, pady=5, sticky=tk.W + tk.E)
+        self.ot_tc_label.grid(row=7, column=0, padx=5, pady=5, sticky=tk.W + tk.E)
 
         self.tc = StringVar()
         self.tune_condition = ttk.Combobox(self, textvariable=self.tc)
@@ -338,20 +280,44 @@ class OpentunerPSFrame(BaseFrame):
         self.tune_condition['state'] = 'readonly'
         self.tune_condition.current(0)
         # self.bind('')
-        self.tune_condition.grid(row=2, column=1, padx=5, pady=5, sticky=tk.W + tk.E)
+        self.tune_condition.grid(row=7, column=2, columnspan=4, padx=5, pady=5, sticky=tk.W + tk.E)
 
         # Save Button
-        self.save_button = tk.Button(self, text='Save', command=self.save_opentuner)
-        self.save_button.grid(row=3, column=1, padx=5, pady=5, sticky=tk.W + tk.E)
+        # self.save_button = tk.Button(self, text='Save', command=self.save_opentuner)
+        # self.save_button.grid(row=3, column=1, padx=5, pady=5, sticky=tk.W + tk.E)
 
-    def save_opentuner(self):
-        value=[]
-        value.append(self.st.get())
-        value.append(self.ot_limit.get())
-        value.append(self.tc.get())
+        self.submit_button = tk.Button(self, text = 'Add', command = self.add_task)
+        self.submit_button.grid(row = 8, column = 7)
 
-        global opentuner_parameter
-        print value
+        Label(self, text='Task Summary: ').grid(row=10)
+
+
+
+
+    def add_task(self):
+        hbvalue = []
+        hbvalue.append(self.workload.get())
+        hbvalue.append(self.hibench_task.get())
+
+        otvalue = []
+        otvalue.append(self.search_technique.get())
+        otvalue.append(self.ot_limit.get())
+        otvalue.append(self.tune_condition.get())
+
+
+        global task_id, hibench_parameter
+        hibench_parameter.append(hbvalue)
+        opentuner_parameter.append(otvalue)
+
+        hblabel = Label(self, text='Task' + str(task_id) + ': ' + hibench_parameter[task_id][1]
+                         + ', Workload: '+ hibench_parameter[task_id][0])\
+            .grid(column=2, columnspan=6)
+
+        Label(self, text='Task limits: ' + opentuner_parameter[task_id][1])\
+            .grid(column=2, columnspan=6)
+        print "finish add task"
+        task_id += 1
+
 
 '''
 haven't implement 
@@ -366,48 +332,57 @@ class PSSummaryFrame(BaseFrame):
         self.menu_bar = tk.Menu()
         top['menu'] = self.menu_bar
 
-        self.menu_bar.add_command(label='Set Spark',
-                                  command=lambda: self.controller.show_frame(SparkPSFrame))
-        self.menu_bar.add_command(label='Set HiBench',
-                                  command=lambda: self.controller.show_frame(HibenchPSFrame))
-        self.menu_bar.add_command(label='Set Opentuner',
-                                  command=lambda: self.controller.show_frame(OpentunerPSFrame))
-        self.menu_bar.add_command(label='Parameter Space Summary',
-                                  command=lambda: self.controller.show_frame(PSSummaryFrame))
-        self.menu_bar.add_command(label='Runtime Monitor',
-                                  command=lambda: self.controller.show_frame(RuntimeFrame))
+        self.flash_PS = tk.Button(self, text='Update Summary', command=self.flash_parameter_summary)
+        self.flash_PS.grid(row=0, column=0, padx = 5, pady = 5, sticky = tk.W + tk.E)
 
+        self.submittasks = tk.Button(self, text='Submit Tasks', command=self.test)
+        self.submittasks.grid(row=0, column=2, padx=5, pady=5, sticky=tk.W + tk.E)
 
-
+    def flash_parameter_summary(self):
 
         self.spark_summary_label = Label(self, text='Spark Summary: ')
-        self.spark_summary_label.grid(row=0, column=0, padx=5, pady=5, sticky=tk.W + tk.E)
+        self.spark_summary_label.grid(column=0, padx=5, pady=5, sticky=tk.W + tk.E)
 
         global spark_parameter, hibench_parameter, opentuner_parameter
 
         print len(spark_parameter), len(hibench_parameter), len(opentuner_parameter)
 
-
         for i in spark_parameter:
-            Label(self, text=str(i)).grid()
+            Label(self, text=str(i)).grid(column=3)
 
         # table:
 
         self.hibench_summary_label = Label(self, text='Hibench Summary: ')
-        self.hibench_summary_label.grid(row=5, column=0, padx=5, pady=5, sticky=tk.W + tk.E)
+        self.hibench_summary_label.grid(column=0, padx=5, pady=5, sticky=tk.W + tk.E)
 
         # table:
-        for i in hibench_parameter:
-            Label(self, text=str(i)).grid()
+        for index, value in enumerate(hibench_parameter):
+            Label(self, text='Task ' + str(index)
+                             + ': Task: '+ value[1]
+                             + ', Workload: ' + value[0]).grid(column=3)
 
         self.opentuner_summary_label = Label(self, text='Opentuner Summary: ')
-        self.opentuner_summary_label.grid(row=10, column=0, padx=5, pady=5, sticky=tk.W + tk.E)
+        self.opentuner_summary_label.grid(column=0, padx=5, pady=5, sticky=tk.W + tk.E)
 
         for i in opentuner_parameter:
-            Label(self, text=str(i)).grid()
+            Label(self, text='Search Tech: ' + str(i[0])
+                             + ', Job Time limits: ' + str(i[1])
+                             + 'Tune Type: ' + str(i[2])).grid(column=3)
 
-        self.submittasks = tk.Button(self, text='Submit Tasks')
-        self.submittasks.grid(padx=5, pady=5, sticky=tk.W + tk.E)
+    def test(self):
+        argparser = opentuner.default_argparser()
+        # print argparser.parse_args()
+
+        param = "python--bail_threshold=500 --database=None --display_frequency=10 \
+                      --generate_bandit_technique=False --label=None --list_techniques=False \
+                      --machine_class=None --no_dups=False --parallel_compile=False \
+                      --parallelism=4 --pipelining=0 --print_params=False \
+                      --print_search_space_size=False --quiet=False --results_log=None \
+                      --results_log_details=None --seed_configuration=[] --stop_after=None \
+                      --technique=None --test_limit=5000"
+
+
+        GccFlagsTuner.main(argparser.parse_args())
 
 
 
@@ -423,14 +398,10 @@ class RuntimeFrame(BaseFrame):
                                   command = lambda: self.controller.show_frame(SparkPSFrame))
         self.menu_bar.add_command(label = 'Set HiBench',
                                   command = lambda: self.controller.show_frame(HibenchPSFrame))
-        self.menu_bar.add_command(label = 'Set Opentuner',
-                                  command = lambda: self.controller.show_frame(OpentunerPSFrame))
         self.menu_bar.add_command(label = 'Parameter Space Summary',
                                   command = lambda: self.controller.show_frame(PSSummaryFrame))
         self.menu_bar.add_command(label = 'Runtime Monitor',
                                   command = lambda: self.controller.show_frame(RuntimeFrame))
-
-
 
         # Example task ID table
         self.taskid_example = Label(self, text='Task1')
@@ -456,9 +427,7 @@ class MFrameUI(tk.Tk):
         self.container.grid(row=0, column=0, sticky=tk.W+tk.E)
 
         self.frames = {}
-        for f in (SparkPSFrame, HibenchPSFrame,
-                  OpentunerPSFrame, PSSummaryFrame,
-                  RuntimeFrame):
+        for f in (SparkPSFrame, HibenchPSFrame, PSSummaryFrame, RuntimeFrame):
             frame = f(self.container, self)
             frame.grid(row=60, column=50, sticky=tk.NW+tk.SE)
             self.frames[f] = frame
