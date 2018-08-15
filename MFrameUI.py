@@ -6,13 +6,9 @@ import Tkinter as tk
 import ttk
 from spark_tuner import GccFlagsTuner
 import opentuner
-
+import gl
 # Global Variable
 
-spark_parameter={}
-hibench_parameter=[]
-opentuner_parameter=[]
-task_id=0
 
 
 class BaseFrame(tk.Frame):
@@ -78,7 +74,7 @@ class SparkPSFrame(BaseFrame):
         
         '''
         # it can be read from a json file
-        spark_PS = {'opt_level':['IntegerParameter', '0-3'],
+        spark_PS = {'early-inlining-insns': ['IntegerParameter', '0-1000'],
                     'align-functions':['EnumParameter', 'on|off|default'],
                     'align-jumps':['EnumParameter', 'on|off|default'],
                     'align-labels':['EnumParameter', 'on|off|default']}
@@ -93,6 +89,7 @@ class SparkPSFrame(BaseFrame):
 
         self.spark_ps=[] # Store the final result
         self.cb_vars=[]
+
         for k,v in spark_PS.items():
             var = IntVar()
             Label(self, text=k).grid(row=crow, column=col)
@@ -157,18 +154,18 @@ class SparkPSFrame(BaseFrame):
 
         for item in final_spark_ps:
             s=item.split()
-            spark_parameter[s[0]] = [s[1],s[2]]
-        print spark_parameter
+            gl.spark_parameter[s[0]] = [s[1],s[2]]
+        print gl.spark_parameter
 
         self.ps_add = Label(self, text='Successfully Added: ')
         self.ps_add.grid(row=17, column=0, padx=5, pady=5, sticky=tk.W + tk.E)
 
-        added_item = Label(self, text=', '.join(list(spark_parameter.keys())))
+        added_item = Label(self, text=', '.join(list(gl.spark_parameter.keys())))
         added_item.grid(row=17, column=1, padx=5, pady=5, sticky=tk.W + tk.E)
 
 
     def add_to_template(self):
-        global spark_parameter
+        # global gl.spark_parameter
         self.ps_add = Label(self, text='Successfully Added')
         self.ps_add.grid(row=17, column=0, padx=5, pady=5, sticky=tk.W + tk.E)
 
@@ -177,31 +174,31 @@ class SparkPSFrame(BaseFrame):
 
         for item in final_spark_ps:
             s = item.split()
-            spark_parameter[s[0]] = [s[1], s[2]]
+            gl.spark_parameter[s[0]] = [s[1], s[2]]
 
-        spark_parameter[self.parameter_title_var.get()]=[self.pt.get(), self.pr.get()]
+        gl.spark_parameter[self.parameter_title_var.get()]=[self.pt.get(), self.pr.get()]
 
-        added_item = Label(self, text=', '.join(list(spark_parameter.keys())))
+        added_item = Label(self, text=', '.join(list(gl.spark_parameter.keys())))
         added_item.grid(row=17, column=1, padx=5, pady=5, sticky=tk.W + tk.E)
 
 
     def create_new_file(self):
-        global spark_parameter
-        spark_parameter.clear()
+        # global gl.spark_parameter
+        gl.spark_parameter.clear()
         self.ps_add = Label(self, text='Successfully Created: ')
         self.ps_add.grid(row=17, column=0, padx=5, pady=5, sticky=tk.W + tk.E)
 
-        added_item = Label(self, text=', '.join(list(spark_parameter.keys())))
+        added_item = Label(self, text=', '.join(list(gl.spark_parameter.keys())))
         added_item.grid(row=17, column=1, padx=5, pady=5, sticky=tk.W + tk.E)
 
     def add_to_new_file(self):
-        global spark_parameter
-        spark_parameter[self.parameter_title_var.get()] = [self.pt.get(), self.pr.get()]
+        # global gl.spark_parameter
+        gl.spark_parameter[self.parameter_title_var.get()] = [self.pt.get(), self.pr.get()]
 
         self.ps_add = Label(self, text='Successfully Added: ')
         self.ps_add.grid(row=17, column=0, padx=5, pady=5, sticky=tk.W + tk.E)
 
-        added_item = Label(self, text=', '.join(list(spark_parameter.keys())))
+        added_item = Label(self, text=', '.join(list(gl.spark_parameter.keys())))
         added_item.grid(row=17, column=1, padx=5, pady=5, sticky=tk.W + tk.E)
 
 
@@ -291,9 +288,6 @@ class HibenchPSFrame(BaseFrame):
 
         Label(self, text='Task Summary: ').grid(row=10)
 
-
-
-
     def add_task(self):
         hbvalue = []
         hbvalue.append(self.workload.get())
@@ -305,18 +299,18 @@ class HibenchPSFrame(BaseFrame):
         otvalue.append(self.tune_condition.get())
 
 
-        global task_id, hibench_parameter
-        hibench_parameter.append(hbvalue)
-        opentuner_parameter.append(otvalue)
+        # global gl.task_id, gl.hibench_parameter
+        gl.hibench_parameter.append(hbvalue)
+        gl.opentuner_parameter.append(otvalue)
 
-        hblabel = Label(self, text='Task' + str(task_id) + ': ' + hibench_parameter[task_id][1]
-                         + ', Workload: '+ hibench_parameter[task_id][0])\
+        hblabel = Label(self, text='Task' + str(gl.task_id) + ': ' + gl.hibench_parameter[gl.task_id][1]
+                         + ', Workload: '+ gl.hibench_parameter[gl.task_id][0])\
             .grid(column=2, columnspan=6)
 
-        Label(self, text='Task limits: ' + opentuner_parameter[task_id][1])\
+        Label(self, text='Task limits: ' + gl.opentuner_parameter[gl.task_id][1])\
             .grid(column=2, columnspan=6)
         print "finish add task"
-        task_id += 1
+        gl.task_id += 1
 
 
 '''
@@ -343,11 +337,11 @@ class PSSummaryFrame(BaseFrame):
         self.spark_summary_label = Label(self, text='Spark Summary: ')
         self.spark_summary_label.grid(column=0, padx=5, pady=5, sticky=tk.W + tk.E)
 
-        global spark_parameter, hibench_parameter, opentuner_parameter
+        # global gl.spark_parameter, gl.hibench_parameter, gl.opentuner_parameter
 
-        print len(spark_parameter), len(hibench_parameter), len(opentuner_parameter)
+        print len(gl.spark_parameter), len(gl.hibench_parameter), len(gl.opentuner_parameter)
 
-        for i in spark_parameter:
+        for i in gl.spark_parameter:
             Label(self, text=str(i)).grid(column=3)
 
         # table:
@@ -356,7 +350,7 @@ class PSSummaryFrame(BaseFrame):
         self.hibench_summary_label.grid(column=0, padx=5, pady=5, sticky=tk.W + tk.E)
 
         # table:
-        for index, value in enumerate(hibench_parameter):
+        for index, value in enumerate(gl.hibench_parameter):
             Label(self, text='Task ' + str(index)
                              + ': Task: '+ value[1]
                              + ', Workload: ' + value[0]).grid(column=3)
@@ -364,25 +358,27 @@ class PSSummaryFrame(BaseFrame):
         self.opentuner_summary_label = Label(self, text='Opentuner Summary: ')
         self.opentuner_summary_label.grid(column=0, padx=5, pady=5, sticky=tk.W + tk.E)
 
-        for i in opentuner_parameter:
+        for i in gl.opentuner_parameter:
             Label(self, text='Search Tech: ' + str(i[0])
                              + ', Job Time limits: ' + str(i[1])
-                             + 'Tune Type: ' + str(i[2])).grid(column=3)
+                             + ', Tune Type: ' + str(i[2])).grid(column=3)
 
     def test(self):
-        argparser = opentuner.default_argparser()
-        # print argparser.parse_args()
 
-        param = "python--bail_threshold=500 --database=None --display_frequency=10 \
-                      --generate_bandit_technique=False --label=None --list_techniques=False \
-                      --machine_class=None --no_dups=False --parallel_compile=False \
-                      --parallelism=4 --pipelining=0 --print_params=False \
-                      --print_search_space_size=False --quiet=False --results_log=None \
-                      --results_log_details=None --seed_configuration=[] --stop_after=None \
-                      --technique=None --test_limit=5000"
+        #default parameter:
+        # --bail_threshold=500 --database=None --display_frequency=10 \
+        # --generate_bandit_technique=False --label=None --list_techniques=False \
+        # --machine_class=None --no_dups=False --parallel_compile=False \
+        # --parallelism=4 --pipelining=0 --print_params=False \
+        # --print_search_space_size=False --quiet=False --results_log=None \
+        # --results_log_details=None --seed_configuration=[] --stop_after=None \
+        # --technique=None --test_limit=5000"
 
-
-        GccFlagsTuner.main(argparser.parse_args())
+        args = opentuner.default_argparser().parse_args()
+        args.no_dups = True
+        args.test_limit = gl.opentuner_parameter[0][1]
+        # args.print_params = True
+        GccFlagsTuner.main(args)
 
 
 
@@ -435,6 +431,9 @@ class MFrameUI(tk.Tk):
 
     def show_frame(self, cls):
         self.frames[cls].tkraise()
+
+
+
 
 if __name__ == "__main__":
     app = MFrameUI()
