@@ -3,10 +3,14 @@
 import adddeps
 from Tkinter import *
 import Tkinter as tk
+import PIL
+from PIL import ImageTk, Image
 import ttk
 from spark_tuner import GccFlagsTuner
 import opentuner
 import gl
+from RuntimeSummary import show_summary
+
 # Global Variable
 
 
@@ -74,7 +78,7 @@ class SparkPSFrame(BaseFrame):
         
         '''
         # it can be read from a json file
-        spark_PS = {'early-inlining-insns': ['IntegerParameter', '0-1000'],
+        spark_PS = {'early-inlining-insns': ['IntegerParameter', '0-10'],
                     'align-functions':['EnumParameter', 'on|off|default'],
                     'align-jumps':['EnumParameter', 'on|off|default'],
                     'align-labels':['EnumParameter', 'on|off|default']}
@@ -137,7 +141,6 @@ class SparkPSFrame(BaseFrame):
         self.pr = StringVar()
         self.parameter_range = Entry(self, textvariable=self.pr)
         self.parameter_range.grid(row=14, column=1, padx=5, pady=5, sticky=tk.W + tk.E)
-
 
         self.ps_SFS_add = Button(self, text='Add to Template', command=self.add_to_template)
         self.ps_SFS_add.grid(row=11, column=2, padx=5, pady=5,sticky=tk.W + tk.E)
@@ -261,7 +264,7 @@ class HibenchPSFrame(BaseFrame):
         # self.bind('')
         self.search_technique.grid(row=5, column=2, columnspan=4, padx=5, pady=5, sticky=tk.W + tk.E)
 
-        self.ot_limit_label = Label(self, text='Limit: ')
+        self.ot_limit_label = Label(self, text='Trials Threshold: ')
         self.ot_limit_label.grid(row=6, column=0, padx=5, pady=5, sticky=tk.W + tk.E)
 
         self.ot_limit = tk.Entry(self, text='limit')
@@ -376,11 +379,12 @@ class PSSummaryFrame(BaseFrame):
 
         args = opentuner.default_argparser().parse_args()
         args.no_dups = True
-        args.test_limit = gl.opentuner_parameter[0][1]
+
+        args.stop_after = gl.opentuner_parameter[0][1]
         # args.print_params = True
+
+
         GccFlagsTuner.main(args)
-
-
 
 
 class RuntimeFrame(BaseFrame):
@@ -392,23 +396,32 @@ class RuntimeFrame(BaseFrame):
 
         self.menu_bar.add_command(label = 'Set Spark',
                                   command = lambda: self.controller.show_frame(SparkPSFrame))
-        self.menu_bar.add_command(label = 'Set HiBench',
+        self.menu_bar.add_command(label = 'Set Tasks',
                                   command = lambda: self.controller.show_frame(HibenchPSFrame))
         self.menu_bar.add_command(label = 'Parameter Space Summary',
                                   command = lambda: self.controller.show_frame(PSSummaryFrame))
         self.menu_bar.add_command(label = 'Runtime Monitor',
                                   command = lambda: self.controller.show_frame(RuntimeFrame))
 
+
+        self.run_Result = tk.Button(self, text='Retrieve the Result', command=self.retrieve_Result_Summary)
+        self.run_Result.grid(row=0, column=0, padx = 5, pady = 5, sticky = tk.W + tk.E)
+
+    def retrieve_Result_Summary(self):
         # Example task ID table
         self.taskid_example = Label(self, text='Task1')
         self.taskid_example.grid(padx=5, pady=5, sticky=tk.W + tk.E)
 
-        self.taskid_summary = Label(self, text='Parameter tuned: A, B, C Hibench Task: A, B, C Opentuner Parameter: A, B, C Parameter Tuned Result: A, B, C')
+        self.taskid_summary = Label(self, text='Summary of Paramter Tuning')
         self.taskid_summary.grid(padx=5, pady=5, sticky=tk.W + tk.E)
 
-        self.top10_ps = PhotoImage(file='index.png')
-        self.test_button = Button(self, image = self.top10_ps)
-        self.test_button.grid(padx=5, pady=5, sticky=tk.W + tk.E)
+        show_summary()
+
+        self.img = PhotoImage(file="img/graph_BLOCK_SIZE.png")
+        self.canvas = Canvas(self, width=400, height=400)
+        self.canvas.grid(padx=5, pady=5, sticky=tk.W + tk.E)
+        self.canvas.create_image(100, 100, image = self.img)
+
 
 class MFrameUI(tk.Tk):
 
