@@ -10,18 +10,12 @@ import opentuner
 from opentuner import ConfigurationManipulator
 from opentuner import IntegerParameter, EnumParameter
 from opentuner import MeasurementInterface
-from opentuner import Result
+from opentuner import Result, resultsdb
+from opentuner.resultsdb.models import *
+import logging
+
+
 import gl
-
-
-import argparse
-
-
-# spark_parameter = {'early-inlining-insns': ['IntegerParameter', '0-1000'],
-#             'align-functions': ['EnumParameter', 'on|off|default'],
-#             'align-jumps': ['EnumParameter', 'on|off|default'],
-#             'align-labels': ['EnumParameter', 'on|off|default']}
-
 
 class GccFlagsTuner(MeasurementInterface):
     def transformation(self, dict):
@@ -46,18 +40,17 @@ class GccFlagsTuner(MeasurementInterface):
         Define the search space by creating a
         ConfigurationManipulator
         """
-        print "INTERED!!!!!!!!!!!!!!!"
 
         self.transformation(gl.spark_parameter)
 
         manipulator = ConfigurationManipulator()
 
         manipulator.add_parameter(
-            IntegerParameter('BLOCK_SIZE', 1, 3))
+            IntegerParameter('BLOCK_SIZE', 1, 1))
 
         # print 'in manipulator'
         for flag in self.enum_param:
-            print flag[0], flag[1]
+            # print flag[0], flag[1]
             manipulator.add_parameter(
                 EnumParameter(flag[0],
                               flag[1]))
@@ -65,10 +58,11 @@ class GccFlagsTuner(MeasurementInterface):
             manipulator.add_parameter(
                 IntegerParameter(i[0], int(i[1]), int(i[2])))
 
-
         return manipulator
 
     def run(self, desired_result, input, limit):
+        log = logging.getLogger(__name__)
+
         """
         Compile and run a given configuration then
         return performance
@@ -80,7 +74,6 @@ class GccFlagsTuner(MeasurementInterface):
         gcc_cmd += ' -D{0}={1}'.format('BLOCK_SIZE', cfg['BLOCK_SIZE'])
 
 
-
         for flag in self.enum_param:
             # print 'flag ' + flag[0]
             if cfg[flag[0]] == 'on':
@@ -89,10 +82,10 @@ class GccFlagsTuner(MeasurementInterface):
                 gcc_cmd += ' -fno-{0}'.format(flag[0])
 
         for i in self.int_param:
-            print i[0], cfg[i[0]]
+            # print i[0], cfg[i[0]]
             gcc_cmd += ' --param {0}={1}'.format(i[0], cfg[i[0]])
-            print gcc_cmd
 
+        # logging.debug(gcc_cmd)
         gcc_cmd += ' -o ./tmp.bin'
 
         compile_result = self.call_program(gcc_cmd)
@@ -111,13 +104,7 @@ class GccFlagsTuner(MeasurementInterface):
         self.manipulator().save_to_file(configuration.data,
                                         'mmm_final_config.json')
 
-'''
-g = GccFlagsTuner()
-g.manipulator(spark_PS) 
 
-arg = opentuner.default_argparser()
-g.main(arg.parse_args())
-'''
 
-# print gl.spark_parameter
-# GccFlagsTuner.main(opentuner.default_argparser().parse_args())
+
+

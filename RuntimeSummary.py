@@ -85,7 +85,7 @@ def show_summary():
         plt.xlabel("Time (s)")
         plt.ylabel("Configuration of " + i)
 
-        plt.savefig("img/" + graph_name, dpi = 30)
+        plt.savefig("img/" + graph_name, dpi = 50)
         plt.figure().clear()
 
 
@@ -143,7 +143,7 @@ def show_summary():
     plt.xlabel("Time (s)")
     plt.ylabel("Parameters")
     plt.gcf().text(0.85, 1, 'On - Red\n Off - Green\n Default - Yellow', fontsize=10)
-    plt.savefig("img/" + 'graph_enumerate_or_boolean_parameters', dpi = 30)
+    plt.savefig("img/" + 'graph_enumerate_or_boolean_parameters', dpi = 50)
 
 
     print "count " + str(count)

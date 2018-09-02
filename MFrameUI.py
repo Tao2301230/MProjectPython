@@ -417,10 +417,27 @@ class RuntimeFrame(BaseFrame):
 
         show_summary()
 
-        self.img = PhotoImage(file="img/graph_BLOCK_SIZE.png")
-        self.canvas = Canvas(self, width=400, height=400)
+        import os
+
+        imgs = os.listdir('img')
+
+        self.img = [PhotoImage(file="img/" + i) for i in imgs]
+        self.canvas = Canvas(self, width=900, height=400)
         self.canvas.grid(padx=5, pady=5, sticky=tk.W + tk.E)
-        self.canvas.create_image(100, 100, image = self.img)
+        for i in range(len(self.img)):
+            self.canvas.create_image(160 + 300 * i, 150, image = self.img[i])
+
+        import json
+        json_result = ""
+        with open('mmm_final_config.json') as json_data:
+            json_result = json.load(json_data)
+            json_data.close()
+
+        print json_result
+        # json_result.replace(',', '\n')
+        # json_result = json_result[1:-1]
+        self.best_parameter_summary = Label(self, text = json_result)
+        self.best_parameter_summary.grid(padx=5, pady=5, sticky=tk.W + tk.E)
 
 
 class MFrameUI(tk.Tk):
