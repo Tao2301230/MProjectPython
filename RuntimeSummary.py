@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
+import gl
 
 def show_summary():
     count = 0
@@ -145,6 +146,13 @@ def show_summary():
     plt.gcf().text(0.85, 1, 'On - Red\n Off - Green\n Default - Yellow', fontsize=10)
     plt.savefig("img/" + 'graph_enumerate_or_boolean_parameters', dpi = 50)
 
+
+
+    gl.summary = ("Total number of best results are: " + str(count) + "\n" +
+                  "Success tests: " + str(total) + "\n" +
+                  "Skipped tests: " + str(error) + "\n" +
+                  "Numeric parameters: " + str(num_col) + "\n" +
+                  "Boolean / Enum parameters: " + str(str_col) )
 
     print "count " + str(count)
     print "total " + str(total)

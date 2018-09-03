@@ -412,17 +412,17 @@ class RuntimeFrame(BaseFrame):
         self.taskid_example = Label(self, text='Task1')
         self.taskid_example.grid(padx=5, pady=5, sticky=tk.W + tk.E)
 
-        self.taskid_summary = Label(self, text='Summary of Paramter Tuning')
-        self.taskid_summary.grid(padx=5, pady=5, sticky=tk.W + tk.E)
-
         show_summary()
+
+        self.task_summary = Label(self, text=gl.summary, anchor = 'w', justify=(LEFT))
+        self.task_summary.grid(padx=5, pady=5, sticky=tk.W + tk.E)
 
         import os
 
         imgs = os.listdir('img')
 
         self.img = [PhotoImage(file="img/" + i) for i in imgs]
-        self.canvas = Canvas(self, width=900, height=400)
+        self.canvas = Canvas(self, width=900, height=270)
         self.canvas.grid(padx=5, pady=5, sticky=tk.W + tk.E)
         for i in range(len(self.img)):
             self.canvas.create_image(160 + 300 * i, 150, image = self.img[i])
@@ -434,9 +434,12 @@ class RuntimeFrame(BaseFrame):
             json_data.close()
 
         print json_result
+        json_result_string = "Result: \n"
+        for k,v in json_result.iteritems():
+            json_result_string += str(k) + " " + str(v) + "\n"
         # json_result.replace(',', '\n')
         # json_result = json_result[1:-1]
-        self.best_parameter_summary = Label(self, text = json_result)
+        self.best_parameter_summary = Label(self, text = json_result_string, anchor = 'w', justify=(LEFT))
         self.best_parameter_summary.grid(padx=5, pady=5, sticky=tk.W + tk.E)
 
 
