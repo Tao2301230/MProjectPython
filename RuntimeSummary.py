@@ -16,7 +16,7 @@ def show_summary():
 
     with open('opentuner.log', 'r') as f:
         for line in f:
-            if 'INFO' in line:
+            if 'configuration' in line:
                 infos.append(line.split("    "))
                 # print info
                 total += 1
@@ -80,11 +80,11 @@ def show_summary():
 
     for i in num_col:
         graph_name = "graph_" + i
-        plt.plot(df['test_time'], df[str(i)])
-        plt.gca().invert_xaxis()
+        plt.plot(df[str(i)], df['test_time'])
+        # plt.gca().invert_xaxis()
         plt.title("Parameter: " + i)
-        plt.xlabel("Time (s)")
-        plt.ylabel("Configuration of " + i)
+        plt.ylabel("Time (s)")
+        plt.xlabel("Configuration of " + i)
 
         plt.savefig("img/" + graph_name, dpi = 50)
         plt.figure().clear()
@@ -118,7 +118,7 @@ def show_summary():
                 dot_color.append('write')
                 dot_label.append('empty')
         # print dot_color
-        ax.scatter(x, y, c = dot_color)
+        ax.scatter(y, x, c = dot_color)
 
         # print(item)
         lb.append(item)
@@ -133,16 +133,16 @@ def show_summary():
     olb = np.arange(0, len(columns) + 1, 1)
     # ax.set_yticks(olb, lb)
 
-    plt.gca().invert_xaxis()
+    # plt.gca().invert_xaxis()
     rcParams.update({'figure.autolayout': True})
 
     # plt.tight_layout()
-    plt.yticks(rotation = 60)
+    plt.xticks(rotation = 60)
     plt.title('Enumerate/boolean parameters')
     fig.subplots_adjust(left = 0.25)
     fig.subplots_adjust()
-    plt.xlabel("Time (s)")
-    plt.ylabel("Parameters")
+    plt.ylabel("Time (s)")
+    plt.xlabel("Parameters")
     plt.gcf().text(0.85, 1, 'On - Red\n Off - Green\n Default - Yellow', fontsize=10)
     plt.savefig("img/" + 'graph_enumerate_or_boolean_parameters', dpi = 50)
 
