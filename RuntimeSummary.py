@@ -154,7 +154,7 @@ def show_summary():
                   "Numeric parameters: " + str(num_col) + "\n" +
                   "Boolean / Enum parameters: " + str(str_col) )
 
-    print "count " + str(count)
-    print "total " + str(total)
-    print "error " + str(error)
+    # print "count " + str(count)
+    # print "total " + str(total)
+    # print "error " + str(error)
 
