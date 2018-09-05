@@ -317,7 +317,7 @@ class HibenchPSFrame(BaseFrame):
 
 
 '''
-haven't implement 
+complete implement 
     3 Summary table: 
     Spark Parameter, Hibench Parameter, Opentuner Parameter
 '''
