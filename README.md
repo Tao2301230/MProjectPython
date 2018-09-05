@@ -22,7 +22,7 @@ This project is mainly built with the support of OpenTuner. The included OpenTun
 
 Main functions are in files: MFrameUI.py, RuntimeSummary.py and SparkTuner.py.
 
-Main GUI is in the MFrameGUI.py. This includes all the GUI components and their linked events. The main function of this file is to accept user inputs, update the global variable and build up the bridge between GUI and processing modules:  sparktuner.py and RuntimeSummary.py.
+Main GUI is in the MFrameGUI.py. This includes all the GUI components and their linked events. The main function of this file is to accept user inputs, update the global variable and build up the bridge between GUI and processing modules:  SparkTuner.py and RuntimeSummary.py.
 
 Global variables are defined in a separated file: gl.py. Variables are defined in the form of dict and list in the file and processed each module. 
 
