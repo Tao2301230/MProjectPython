@@ -4,8 +4,6 @@ import opentuner
 import gl
 from spark_tuner import GccFlagsTuner
 
-
-
 import argparse
 
 gl.spark_parameter = {'early-inlining-insns': ['IntegerParameter', '0-1000'],
