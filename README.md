@@ -13,7 +13,10 @@ This project is mainly built with the support of OpenTuner. The included OpenTun
 
 ### Other Requirements
 
-python 2.7, argparse, Tkinter 8.6, SQLite 2.2.
+* [python 2.7](https://www.python.org/downloads/release/python-2712/) - The programming language arparse package.
+* [Tkinter 8.6](https://www.tcl.tk/software/tcltk/8.6.html) - Graphical package
+* [SQLite 3.11.0](https://www.sqlite.org/releaselog/3_11_0.html) - Database
+
 
 ## Main Components
 
